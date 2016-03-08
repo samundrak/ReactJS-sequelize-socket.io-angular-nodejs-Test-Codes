@@ -1,12 +1,35 @@
+function formValidator(context){
+	var data =  {};
+		var checker = [];
+		Object.keys(context.refs).forEach(function(keys){
+			data[keys] = ReactDOM.findDOMNode(context.refs[keys]).value;
+			if(data[keys].length < 1){
+				checker.push(keys);
+			}
+		});
+		if(checker.length){
+			context.setState({
+				messages  : checker.toString() + ' is missing!!!'
+			});
+			return false;
+		}
+		context.setState({messages:''});
+		return data;
+}
+
 var ResponseMessages =  React.createClass({
+	close : function(){
+		this.props.message = ''
+		console.log(1)
+	},
 	render: function(){
 		return (
 			<div>
-			<p>{this.props.message}</p>
+			<p  className="label label-danger">{this.props.message}</p>
 			</div>
 		)
 	}
-});
+});   
 var Form =  React.createClass({
 	getInitialState : function(){
 		return {
@@ -14,7 +37,7 @@ var Form =  React.createClass({
 			username : undefined,
 			password : "",
 			},
-			messages : 'Enter your username and password'
+			// messages : ''
 		}
 	},
 	componentDidMount: function(){
@@ -28,24 +51,20 @@ var Form =  React.createClass({
 	},
 	handleLogin: function(e){
 		e.preventDefault();
-		var username = ReactDOM.findDOMNode(this.refs.username);
-		this.state.login.username = username.value;
-		var password =  ReactDOM.findDOMNode(this.refs.password);
-		this.state.login.password =  password.value;
-		if(username && password){
-			io.emit('loginUser',this.state.login);
-		}
+		var data = formValidator(this)
+		if(!data) return;
+		io.emit('loginUser',data);
 	},
 	render: function(){
 		return (
 			<div><form onSubmit={this.handleLogin} >
 				<p>Username</p>
-				<input type="text"   defaultValue={this.state.login.username} ref="username" name="username"/>
+				<input className="form-control" type="text"   defaultValue={this.state.login.username} ref="username" name="username"/>
 				<br/>
 				<p>Password</p>
-				<input type="password" ref="password" defaultValue={this.state.login.password} />
+				<input className="form-control" type="password" ref="password" defaultValue={this.state.login.password} />
 				<br/>
-				<input type="submit" name="submit" value="submit"/>
+				<input className="btn btn-primary" type="submit" name="submit" value="submit"/>
 				</form> 
 				<ResponseMessages  message={this.state.messages} />
 			</div>
@@ -53,4 +72,69 @@ var Form =  React.createClass({
 	}
 });
 
+var RegisterForm = React.createClass({
+	getInitialState: function(){
+		return {
+			messages : ''
+		}
+	},
+	register : function(e){
+		e.preventDefault();
+		var data = formValidator(this); 
+		if(!data)return;
+		io.emit('registerÚser',data);
+	},
+	render :function(){
+		return(
+			<form onSubmit={this.register}>
+			<div className="label label-danger">{this.state.messages}</div>
+			<table class="table ">
+			<tr><td> Firstname </td>
+			<td>
+				<input className="form-control"  type="text" ref="firstname"/>
+				</td>
+			</tr>
+			<tr>
+			<td>Lastname</td>
+			<td>
+			<input className="form-control"  type="text" ref="lastname"/>
+			</td>
+			</tr>
+			
+			<tr>
+			<td>
+				Username
+			</td>
+			<td>
+			<input className="form-control"  type="text" ref="username"/>
+			</td>
+			</tr>
+
+			<tr>
+			<td>Password</td>
+			<td>
+			<input className="form-control"  type="text" ref="password"/>
+			</td>
+			</tr>
+
+			<tr>
+			<td>Email</td>
+			<td>
+			<input className="form-control" type="text" ref="email"/>
+			</td>
+			</tr>
+
+			<tr>
+			<td>
+			<input className="btn btn-primary" type="submit" value="submit"/>
+			</td>
+			<td></td>
+			</tr>
+
+			</table>
+			</form>
+		)
+	}
+})
 ReactDOM.render(<Form/>,document.getElementById('content'));
+ReactDOM.render(<RegisterForm/>,document.getElementById('registerArea'));

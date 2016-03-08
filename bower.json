@@ -1,0 +1,20 @@
+{
+  "name": "server",
+  "description": "",
+  "main": "app.js",
+  "authors": [
+    "Samundrak"
+  ],
+  "license": "MIT",
+  "moduleType": [
+    "globals"
+  ],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
